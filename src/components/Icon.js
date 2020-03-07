@@ -8,13 +8,17 @@ const Wrapper = styled.aside`
   align-items: center;
   margin-bottom: 0.8rem;
   .icon {
-    width: 1.8rem;
-    height: 1.8rem;
+    width: 1.4rem;
+    height: 1.4rem;
   }
 `;
 
-const Icon = ({ icon, handleClick }) => {
-  return <Wrapper onClick={handleClick}>{icon}</Wrapper>;
+const Icon = ({ icon, handleClick = () => {} }) => {
+  return (
+    <Wrapper className="icon" onClick={handleClick}>
+      {icon}
+    </Wrapper>
+  );
 };
 
 export default Icon;

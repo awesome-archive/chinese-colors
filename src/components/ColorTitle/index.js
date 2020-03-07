@@ -1,29 +1,40 @@
 import React from 'react';
 import styled from 'styled-components';
 import IconFav from './IconFav';
-import IconCopy from './IconCopy';
+import { useMobile, usePoetry } from '../../hooks';
+
+import { getCorrectTextColor } from '../../utils';
+import Poetry from './Poetry';
+import FadeIn from '../animates/FadeIn';
 
 const Wrapper = styled.hgroup`
   color: #333;
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
   justify-content: space-around;
   align-items: center;
-  align-self: center;
   box-shadow: 0 0 8px rgba(0, 0, 0, 0.5);
   border-radius: 6px;
   padding: 1rem 0.8rem;
   position: relative;
   width: 4.6rem;
   cursor: default;
-  margin-top: -6rem;
+  margin-top: 1rem;
   margin-right: 0.5rem;
-
+  min-height: 18rem;
+  &.mobile {
+    width: 5.8rem;
+    margin-top: 8rem;
+    > h1 {
+      font-size: 3.6rem;
+    }
+  }
   &:hover > h1 {
     transform: scale(1.1);
   }
 
   > h1 {
+    color: inherit;
     font-size: 3.2rem;
     letter-spacing: -0.5rem;
     writing-mode: vertical-lr;
@@ -38,29 +49,53 @@ const Wrapper = styled.hgroup`
     writing-mode: vertical-lr;
     position: absolute;
     right: 0.2rem;
-    bottom: 0.4rem;
-    color: rgba(255, 255, 255, 0.66);
+    top: 0.4rem;
+    color: inherit;
   }
   > h3 {
     width: 100%;
     position: absolute;
     left: -0.4rem;
-    bottom: -2.8rem;
+    top: -2rem;
     display: flex;
+  }
+  .figure {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    z-index: -1;
+    opacity: 0;
+    animation: ${FadeIn} 1s forwards;
+    animation-delay: 1s;
   }
 `;
 
-const ColorTitle = ({ name, pinyin, hex, RGB, CMYK }) => {
+const ColorTitle = ({ name, pinyin, hex, RGB, CMYK, figure }) => {
+  const { isMobile } = useMobile();
+  const { poetry, fetchPoetry } = usePoetry(name);
+  const oppoColor = getCorrectTextColor(RGB);
+
+  console.log('color title');
+
   return (
-    <Wrapper>
+    <Wrapper className={isMobile ? 'mobile' : ''} style={{ color: oppoColor }}>
       <h1>{name}</h1>
       <IconFav currColor={{ hex, name, pinyin, RGB, CMYK }} />
       <h2>{pinyin}</h2>
-      <h3>
-        <IconCopy currColorHex={hex} />
-      </h3>
+      {poetry && (
+        <Poetry
+          refetch={fetchPoetry}
+          bgColor={`rgba(${RGB.join(',')},.5)`}
+          fontColor={oppoColor}
+          {...poetry}
+        />
+      )}
+      {figure && <img className="figure" src={`figure/${figure}`} alt="figure" />}
     </Wrapper>
   );
 };
-
+ColorTitle.whyDidYouRender = {
+  logOnDifferentValues: true,
+  customName: 'ColorTitleComp'
+};
 export default ColorTitle;

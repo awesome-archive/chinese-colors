@@ -57,21 +57,31 @@ const sleep = async (dur = 2) => {
     }, misDur);
   });
 };
-const Download = ({ name, isWebview = false, ...rest }) => {
+const Download = ({
+  query = '#PREVIEW',
+  full = true,
+  name = 'default',
+  isWebview = false,
+  ...rest
+}) => {
   const [generating, setGenerating] = useState(false);
 
   const btn = useRef(null);
   const generateImage = async (ele, name, isWebview = false) => {
     setGenerating(true);
-    await sleep(4);
+    await sleep(1);
     html2canvas(ele, {
+      debug: process.env.NODE_ENV !== 'production',
       onclone: document => {
-        let tmp = document.querySelector('#PREVIEW');
+        let tmp = document.querySelector(query);
         tmp.classList.add('starting');
         if (isWebview) {
           tmp.style.boxShadow = 'none';
         }
-        tmp.style.height = window.innerHeight + 'px';
+        if (full) {
+          tmp.style.height = window.innerHeight + 'px';
+        }
+        console.log('dommmm', tmp.innerHTML);
       },
       scale: window.devicePixelRatio * (isWebview ? 2 : 1)
     }).then(function(canvas) {
@@ -102,7 +112,7 @@ const Download = ({ name, isWebview = false, ...rest }) => {
   };
   const handleDownloadClick = async () => {
     // startScreenshoot();
-    let ele = document.querySelector('#PREVIEW');
+    let ele = document.querySelector(query);
 
     await generateImage(ele, name, isWebview);
     if (isWebview) {
@@ -111,7 +121,7 @@ const Download = ({ name, isWebview = false, ...rest }) => {
   };
   return (
     <Wrapper disabled={generating} ref={btn} onClick={handleDownloadClick} {...rest}>
-      {generating ? `生成中...` : `生成壁纸`}
+      {generating ? `生成中...` : `生成图片`}
     </Wrapper>
   );
 };
